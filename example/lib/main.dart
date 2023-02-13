@@ -18,25 +18,15 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          leading: Icon(UiIcons.account),
-        ),
-        body: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              UiIcons.account,
-              UiIcons.arrow_left,
-              UiIcons.collection,
-              UiIcons.arrow_right,
-            ]
-                .map((iconData) => Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Icon(iconData),
-                    ))
-                .cast<Widget>()
-                .toList(),
-          ),
-        ),
-      );
+      appBar: AppBar(),
+      body: Wrap(
+        spacing: 50,
+        runSpacing: 50,
+        children: UiIcons.all.entries
+            .map((e) => Icon(
+                  e.value,
+                  size: 5,
+                ))
+            .toList(),
+      ));
 }

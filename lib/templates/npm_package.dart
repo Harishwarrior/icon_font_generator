@@ -6,7 +6,7 @@ const String npmPackageTemplate = '''
   "version": "1.0.0",
   "license": "MIT",
   "devDependencies": {
-    "fantasticon": "^1.2.2"
+    "fantasticon": "^2.0.0"
   }
 }
 ''';
