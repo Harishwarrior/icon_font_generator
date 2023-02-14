@@ -6,7 +6,8 @@ const String npmPackageTemplate = '''
   "version": "1.0.0",
   "license": "MIT",
   "devDependencies": {
-    "fantasticon": "^2.0.0"
+    "fantasticon": "^2.0.0",
+    "oslllo-svg-fixer": "^2.2.0"
   }
 }
 ''';

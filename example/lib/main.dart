@@ -18,15 +18,18 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(),
-      body: Wrap(
-        spacing: 50,
-        runSpacing: 50,
-        children: UiIcons.all.entries
-            .map((e) => Icon(
-                  e.value,
-                  size: 5,
-                ))
-            .toList(),
-      ));
+        appBar: AppBar(),
+        body: Icon(UiIcons.my_plan_outlined),
+
+        // Wrap(
+        //   spacing: 50,
+        //   runSpacing: 50,
+        //   children: UiIcons.all.entries
+        //       .map((e) => Icon(
+        //             e.value,
+        //             // size: 10,
+        //           ))
+        //       .toList(),
+        // ),
+      );
 }

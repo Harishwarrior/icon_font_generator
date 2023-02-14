@@ -26,6 +26,11 @@ class GenerateCommand extends Command {
         help: 'Input dir with svg\'s',
       )
       ..addOption(
+        'out-fix',
+        abbr: 's',
+        help: 'Input dir with svg\'s',
+      )
+      ..addOption(
         'out-font',
         help: 'Output icon font',
       )
@@ -89,6 +94,7 @@ class GenerateCommand extends Command {
     }
 
     if (argResults!['from'] == null ||
+        argResults!['out-fix'] == null ||
         argResults!['out-font'] == null ||
         argResults!['out-flutter'] == null ||
         argResults!['class-name'] == null) {
@@ -139,6 +145,8 @@ class GenerateCommand extends Command {
 
     final sourceIconsDirectory = Directory.fromUri(Directory.current.uri
         .resolve(argResults!['from'].replaceAll('\\', '/')));
+    final fixedOutDirectory = Directory.fromUri(Directory.current.uri
+        .resolve(argResults!['out-fix'].replaceAll('\\', '/')));
     final outIconsFile = File.fromUri(Directory.current.uri
         .resolve(argResults!['out-font'].replaceAll('\\', '/')));
     final outFlutterClassFile = File.fromUri(Directory.current.uri
@@ -152,6 +160,22 @@ class GenerateCommand extends Command {
       tempSourceDirectory,
     );
 
+    // fix svg
+    final fixsvg = await Process.start(
+      path.join(
+        genRootDir.path,
+        'node_modules/.bin/oslllo-svg-fixer${Platform.isWindows ? '.cmd' : ''}',
+      ),
+      [
+        '--source',
+        path.absolute(tempSourceDirectory.path),
+        '--destination',
+        path.absolute(fixedOutDirectory.path),
+      ],
+      workingDirectory: genRootDir.path,
+      runInShell: true,
+    );
+
     // gen font
     final generateFont = await Process.start(
       path.join(
@@ -159,7 +183,7 @@ class GenerateCommand extends Command {
         'node_modules/.bin/fantasticon${Platform.isWindows ? '.cmd' : ''}',
       ),
       [
-        path.absolute(tempSourceDirectory.path),
+        path.absolute(fixedOutDirectory.path),
         '--font-height',
         argResults!['height'],
         '--descent',
@@ -179,6 +203,14 @@ class GenerateCommand extends Command {
       runInShell: true,
     );
 
+    await stdout.addStream(fixsvg.stdout.map((bytes) {
+      var message = utf8.decode(bytes);
+      if (message == '\x1b[32m0\x1b[39m\n') {
+        message = '\x1b[32mSuccess generated font\x1b[39m\n';
+      }
+      return utf8.encode(message);
+    }));
+
     await stdout.addStream(generateFont.stdout.map((bytes) {
       var message = utf8.decode(bytes);
       if (message == '\x1b[32mDone\x1b[39m\n') {
@@ -187,6 +219,8 @@ class GenerateCommand extends Command {
       return utf8.encode(message);
     }));
     final stdlib = 'Invalid member of stdlib';
+    await stderr.addStream(
+        fixsvg.stderr.where((bytes) => !utf8.decode(bytes).contains(stdlib)));
     await stderr.addStream(generateFont.stderr
         .where((bytes) => !utf8.decode(bytes).contains(stdlib)));
 
